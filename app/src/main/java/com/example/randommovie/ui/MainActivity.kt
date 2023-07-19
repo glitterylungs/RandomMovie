@@ -1,4 +1,4 @@
-package com.example.randommovie
+package com.example.randommovie.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
