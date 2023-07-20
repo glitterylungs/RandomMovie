@@ -11,7 +11,7 @@ class MovieListApiToMovieListMapperImpl(
 
     override fun map(input: MovieListApi): MovieList =
         MovieList(
-            response = input.response.map { movieApi ->
+            results = input.results.map { movieApi ->
                 movieApiToMovieMapper.map(movieApi)
             }
         )
