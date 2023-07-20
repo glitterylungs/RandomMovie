@@ -4,34 +4,39 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.randommovie.repository.MovieRepository
-import com.example.randommovie.repository.model.Movie
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class MovieDetailsViewModel(
     private val movieRepository: MovieRepository
 ) : ViewModel() {
 
-    var movie: MutableState<Movie?> = mutableStateOf(null)
+    var movieDetailsState: MutableState<MovieDetailsState> =
+        mutableStateOf(MovieDetailsState.Loading)
         private set
 
     var isFavourite: MutableState<Boolean> = mutableStateOf(false)
 
-    var errorMessage: MutableState<String?> = mutableStateOf(null)
+    private var randomMovieDisposable: Disposable? = null
 
     fun getRandomMovie() {
-        movieRepository.getRandomMovies("most_pop_movies", 1)
+        randomMovieDisposable = movieRepository.getRandomMovies("most_pop_movies", 1)
             .subscribeOn(Schedulers.io())
-            .doOnSuccess { movieList ->
+            .subscribe({ movieList ->
                 val movie = movieList.results.firstOrNull()
                 if (movie != null) {
-                    this@MovieDetailsViewModel.movie.value = movie
+                    movieDetailsState.value = MovieDetailsState.Success(movie)
                 } else {
-                    errorMessage.value = "No movie found"
+                    movieDetailsState.value = MovieDetailsState.Error("No movie found")
                 }
-            }
-            .doOnError { error ->
-                errorMessage.value = error.message ?: "Unknown error occurred"
-            }
-            .subscribe()
+            }, { error ->
+                movieDetailsState.value =
+                    MovieDetailsState.Error(error.message ?: "Unknown error occurred")
+            })
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        randomMovieDisposable?.dispose() // Dispose of the subscription when ViewModel is cleared
     }
 }

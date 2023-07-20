@@ -42,7 +42,7 @@ private fun okHttpClientBuilder(keyValue: String, hostValue: String): OkHttpClie
             val requestBuilder = originalRequest.newBuilder()
                 .header("X-RapidAPI-Key", keyValue)
                 .header("X-RapidAPI-Host", hostValue)
-                .method(originalRequest.method(), originalRequest.body())
+                .method(originalRequest.method, originalRequest.body)
             val request = requestBuilder.build()
             chain.proceed(request)
         }
