@@ -1,4 +1,4 @@
-package com.example.randommovie.api.model
+package com.example.randommovie.repository.model
 
 data class Movie(
     val titleText: TitleText,
