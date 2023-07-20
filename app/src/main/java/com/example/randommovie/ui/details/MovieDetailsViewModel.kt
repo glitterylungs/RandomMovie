@@ -15,17 +15,16 @@ class MovieDetailsViewModel(
         mutableStateOf(MovieDetailsState.Loading)
         private set
 
-    var isFavourite: MutableState<Boolean> = mutableStateOf(false)
-
     private var randomMovieDisposable: Disposable? = null
 
     fun getRandomMovie() {
         randomMovieDisposable = movieRepository.getRandomMovies("most_pop_movies", 1)
             .subscribeOn(Schedulers.io())
             .subscribe({ movieList ->
-                val movie = movieList.results.firstOrNull()
+                val movie = movieList.results?.firstOrNull()
                 if (movie != null) {
                     movieDetailsState.value = MovieDetailsState.Success(movie)
+                    println(movie.primaryImage?.url)
                 } else {
                     movieDetailsState.value = MovieDetailsState.Error("No movie found")
                 }

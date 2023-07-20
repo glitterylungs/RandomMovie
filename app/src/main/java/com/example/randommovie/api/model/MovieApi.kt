@@ -1,19 +1,19 @@
 package com.example.randommovie.api.model
 
 data class MovieApi(
-    val titleText: TitleTextApi,
-    val releaseYear: ReleaseYearApi,
-    val primaryImage: PrimaryImageApi
+    val titleText: TitleTextApi?,
+    val releaseYear: ReleaseYearApi?,
+    val primaryImage: PrimaryImageApi?
 )
 
 data class PrimaryImageApi(
-    val url: String
+    val url: String?
 )
 
 data class TitleTextApi(
-    val text: String
+    val text: String?
 )
 
 data class ReleaseYearApi(
-    val year: Int
+    val year: Int?
 )
