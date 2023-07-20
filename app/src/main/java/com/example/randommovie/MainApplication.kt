@@ -1,7 +1,9 @@
 package com.example.randommovie
 
 import android.app.Application
+import com.example.randommovie.di.mapperModule
 import com.example.randommovie.di.networkModule
+import com.example.randommovie.di.repositoryModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -14,6 +16,8 @@ class MainApplication : Application() {
             androidContext(this@MainApplication)
             modules(
                 networkModule,
+                repositoryModule,
+                mapperModule,
             )
         }
     }
