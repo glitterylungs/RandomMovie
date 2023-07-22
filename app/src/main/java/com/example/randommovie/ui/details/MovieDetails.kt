@@ -1,5 +1,6 @@
 package com.example.randommovie.ui.details
 
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,10 +31,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -42,12 +46,21 @@ import coil.compose.AsyncImage
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetails(
-    viewModel: MovieDetailsViewModel = koinViewModel()
+    viewModel: MovieDetailsViewModel = koinViewModel(),
+    navigateToFavourites: () -> Unit
 ) {
     val state by remember { viewModel.movieDetailsState }
+    var isScreenSwipedLeft by remember { mutableStateOf(false) }
 
     LaunchedEffect(true) {
         viewModel.getRandomMovie()
+    }
+
+    LaunchedEffect(isScreenSwipedLeft) {
+        if (isScreenSwipedLeft) {
+            isScreenSwipedLeft = false
+            navigateToFavourites()
+        }
     }
 
     Scaffold(
@@ -80,6 +93,13 @@ fun MovieDetails(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
+                        .pointerInput(Unit) {
+                            detectHorizontalDragGestures { _, dragAmount ->
+                                if (dragAmount < 0) {
+                                    isScreenSwipedLeft = true
+                                }
+                            }
+                        }
                         .padding(
                             start = 15.dp,
                             top = it.calculateTopPadding(),
