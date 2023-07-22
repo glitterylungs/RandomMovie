@@ -9,11 +9,14 @@ val viewModelModule = module {
 
     viewModel {
         MovieDetailsViewModel(
-            movieRepository = get()
+            movieRepository = get(),
+            favouriteMovieRepository = get()
         )
     }
 
     viewModel {
-        FavouriteMoviesViewModel()
+        FavouriteMoviesViewModel(
+            favouriteMovieRepository = get()
+        )
     }
 }
