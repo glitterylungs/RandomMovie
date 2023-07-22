@@ -1,19 +1,19 @@
 package com.example.randommovie.repository.model
 
 data class Movie(
-    val titleText: TitleText,
-    val releaseYear: ReleaseYear,
-    val primaryImage: PrimaryImage
+    val titleText: TitleText?,
+    val releaseYear: ReleaseYear?,
+    val primaryImage: PrimaryImage?
 )
 
 data class PrimaryImage(
-    val url: String
+    val url: String?
 )
 
 data class TitleText(
-    val text: String
+    val text: String?
 )
 
 data class ReleaseYear(
-    val year: Int
+    val year: Int?
 )
