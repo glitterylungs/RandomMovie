@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,6 +51,7 @@ fun MovieDetails(
     navigateToFavourites: () -> Unit
 ) {
     val state by remember { viewModel.movieDetailsState }
+    val isFavourite by remember { viewModel.isFavourite }
     var isScreenSwipedLeft by remember { mutableStateOf(false) }
 
     LaunchedEffect(true) {
@@ -161,12 +163,28 @@ fun MovieDetails(
                                 modifier = Modifier.size(50.dp)
                             )
                         }
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(
-                                imageVector = Icons.Default.Favorite,
-                                contentDescription = "Favourite",
-                                modifier = Modifier.size(50.dp)
-                            )
+                        movie.titleText?.text?.let { title ->
+                            IconButton(
+                                onClick = { viewModel.addMovieToFavourites(title) },
+                                enabled = !isFavourite
+                            ) {
+                                if (isFavourite) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Favorite,
+                                        contentDescription = "Favourite",
+                                        modifier = Modifier.size(50.dp),
+                                        tint = Color.Red
+                                    )
+                                } else {
+                                    Icon(
+                                        imageVector = Icons.Outlined.FavoriteBorder,
+                                        contentDescription = "Not favourite",
+                                        modifier = Modifier.size(50.dp),
+                                        tint = Color.Red
+                                    )
+                                }
+
+                            }
                         }
                     }
                 }

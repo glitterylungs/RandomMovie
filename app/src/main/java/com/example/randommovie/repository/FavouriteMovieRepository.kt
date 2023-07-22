@@ -11,7 +11,9 @@ interface FavouriteMovieRepository {
 
     suspend fun addFavouriteMovie(movie: FavouriteMovie)
 
-    suspend fun getFavouriteMovies(): Flow<List<FavouriteMovie>>
+    fun getFavouriteMovies(): Flow<List<FavouriteMovie>>
+
+    suspend fun isMovieFavourite(title: String): Boolean
 
     suspend fun deleteFavouriteMovie(id: Int)
 }
@@ -26,12 +28,15 @@ class FavouriteMovieRepositoryImpl(
         favouriteMovieDao.insertFavouriteMovie(favouriteMovieToFavouriteMovieDbMapper.map(movie))
     }
 
-    override suspend fun getFavouriteMovies(): Flow<List<FavouriteMovie>> =
+    override fun getFavouriteMovies(): Flow<List<FavouriteMovie>> =
         favouriteMovieDao.getFavouriteMovies().map {
             it.map { movie ->
                 favouriteMovieDbToFavouriteMovieMapper.map(movie)
             }
         }
+
+    override suspend fun isMovieFavourite(title: String): Boolean =
+        favouriteMovieDao.isMovieFavourite(title)
 
     override suspend fun deleteFavouriteMovie(id: Int) {
         favouriteMovieDao.deleteFavouriteMovie(id)
