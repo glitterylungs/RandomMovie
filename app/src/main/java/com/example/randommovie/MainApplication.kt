@@ -1,6 +1,7 @@
 package com.example.randommovie
 
 import android.app.Application
+import com.example.randommovie.di.databaseModule
 import com.example.randommovie.di.mapperModule
 import com.example.randommovie.di.networkModule
 import com.example.randommovie.di.repositoryModule
@@ -20,6 +21,7 @@ class MainApplication : Application() {
                 repositoryModule,
                 mapperModule,
                 viewModelModule,
+                databaseModule,
             )
         }
     }

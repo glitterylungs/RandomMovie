@@ -1,5 +1,9 @@
 package com.example.randommovie.di
 
+import com.example.randommovie.mapper.FavouriteMovieDbToFavouriteMovieMapper
+import com.example.randommovie.mapper.FavouriteMovieDbToFavouriteMovieMapperImpl
+import com.example.randommovie.mapper.FavouriteMovieToFavouriteMovieDbMapper
+import com.example.randommovie.mapper.FavouriteMovieToFavouriteMovieDbMapperImpl
 import com.example.randommovie.mapper.MovieApiToMovieMapper
 import com.example.randommovie.mapper.MovieApiToMovieMapperImpl
 import com.example.randommovie.mapper.MovieListApiToMovieListMapper
@@ -38,5 +42,13 @@ val mapperModule = module {
 
     single<PrimaryImageApiToPrimaryImageMapper> {
         PrimaryImageApiToPrimaryImageMapperImpl()
+    }
+
+    single<FavouriteMovieDbToFavouriteMovieMapper> {
+        FavouriteMovieDbToFavouriteMovieMapperImpl()
+    }
+
+    single<FavouriteMovieToFavouriteMovieDbMapper> {
+        FavouriteMovieToFavouriteMovieDbMapperImpl()
     }
 }
