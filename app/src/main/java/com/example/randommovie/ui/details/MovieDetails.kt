@@ -1,10 +1,10 @@
 package com.example.randommovie.ui.details
 
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -41,8 +41,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.randommovie.repository.model.Movie
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +70,10 @@ fun MovieDetails(
     Scaffold(
         topBar = {
             TopAppBar(title = {
-                Text(text = "Random Movie", style = MaterialTheme.typography.headlineMedium)
+                Text(
+                    text = "Random Movie",
+                    style = MaterialTheme.typography.headlineMedium
+                )
             })
         }
     ) {
@@ -82,113 +87,149 @@ fun MovieDetails(
                 }
             }
             is MovieDetailsState.Error -> {
-                Box(
+                Column(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = (state as MovieDetailsState.Error).errorMessage)
+                    Text(
+                        text = (state as MovieDetailsState.Error).errorMessage,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                    )
+                    Refresh(
+                        contentDescription = "Refresh",
+                        onClick = { viewModel.getRandomMovie() }
+                    )
                 }
             }
             is MovieDetailsState.Success -> {
                 val movie = (state as MovieDetailsState.Success).movie
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .pointerInput(Unit) {
-                            detectHorizontalDragGestures { _, dragAmount ->
-                                if (dragAmount < 0) {
-                                    isScreenSwipedLeft = true
-                                }
-                            }
-                        }
-                        .padding(
-                            start = 15.dp,
-                            top = it.calculateTopPadding(),
-                            end = 15.dp,
-                            bottom = 10.dp
-                        ),
-                    horizontalAlignment = Alignment.CenterHorizontally
+
+                MovieDetailsSuccessContent(
+                    movie = movie,
+                    isFavourite = isFavourite,
+                    onScreenSwipedLeft = { isScreenSwipedLeft = true },
+                    onAddToFavourites = { title -> viewModel.addMovieToFavourites(title) },
+                    onGetRandomMovie = { viewModel.getRandomMovie() },
+                    paddingValues = it
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MovieDetailsSuccessContent(
+    movie: Movie,
+    isFavourite: Boolean,
+    onScreenSwipedLeft: () -> Unit,
+    onAddToFavourites: (String) -> Unit,
+    onGetRandomMovie: () -> Unit,
+    paddingValues: PaddingValues,
+
+    ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures { _, dragAmount ->
+                    if (dragAmount < 0) {
+                        onScreenSwipedLeft()
+                    }
+                }
+            }
+            .padding(
+                start = 15.dp,
+                top = paddingValues.calculateTopPadding(),
+                end = 15.dp,
+                bottom = 10.dp
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .clip(RoundedCornerShape(10.dp))
+        ) {
+            movie.primaryImage?.url?.let { url ->
+                AsyncImage(
+                    model = url,
+                    contentDescription = movie.titleText?.text,
+                    modifier = Modifier.aspectRatio(2f / 3f),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.padding(25.dp))
+
+        movie.titleText?.text?.let { title ->
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        movie.releaseYear?.year?.let { year ->
+            Text(
+                text = year.toString(),
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1.0f))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Refresh(
+                contentDescription = "Draw new movie",
+                onClick = onGetRandomMovie
+            )
+
+            movie.titleText?.text?.let { title ->
+                IconButton(
+                    onClick = { onAddToFavourites(title) },
+                    enabled = !isFavourite
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .clip(RoundedCornerShape(10.dp))
-                    ) {
-                        if (movie.primaryImage?.url != null) {
-                            AsyncImage(
-                                model = movie.primaryImage.url,
-                                contentDescription = movie.titleText?.text,
-                                modifier = Modifier.aspectRatio(2f / 3f),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Gray)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    movie.titleText?.text?.let { title ->
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
+                    if (isFavourite) {
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = "Favourite",
+                            modifier = Modifier.size(50.dp),
+                            tint = Color.Red
                         )
-                    }
-
-                    Spacer(modifier = Modifier.padding(10.dp))
-
-                    movie.releaseYear?.year?.let { year ->
-                        Text(
-                            text = year.toString(),
-                            style = MaterialTheme.typography.bodyLarge
+                    } else {
+                        Icon(
+                            imageVector = Icons.Outlined.FavoriteBorder,
+                            contentDescription = "Not favourite",
+                            modifier = Modifier.size(50.dp),
+                            tint = Color.Red
                         )
-                    }
-
-                    Spacer(modifier = Modifier.weight(1.0f))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        IconButton(onClick = { viewModel.getRandomMovie() }) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh,
-                                contentDescription = "Draw new movie",
-                                modifier = Modifier.size(50.dp)
-                            )
-                        }
-                        movie.titleText?.text?.let { title ->
-                            IconButton(
-                                onClick = { viewModel.addMovieToFavourites(title) },
-                                enabled = !isFavourite
-                            ) {
-                                if (isFavourite) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Favorite,
-                                        contentDescription = "Favourite",
-                                        modifier = Modifier.size(50.dp),
-                                        tint = Color.Red
-                                    )
-                                } else {
-                                    Icon(
-                                        imageVector = Icons.Outlined.FavoriteBorder,
-                                        contentDescription = "Not favourite",
-                                        modifier = Modifier.size(50.dp),
-                                        tint = Color.Red
-                                    )
-                                }
-
-                            }
-                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun Refresh(
+    contentDescription: String,
+    onClick: () -> Unit
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            imageVector = Icons.Default.Refresh,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(50.dp)
+        )
     }
 }
