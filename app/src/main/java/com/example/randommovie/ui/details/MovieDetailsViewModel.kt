@@ -29,18 +29,20 @@ class MovieDetailsViewModel(
     fun getRandomMovie() {
         randomMovieDisposable = movieRepository.getRandomMovies("most_pop_movies", 1)
             .subscribeOn(Schedulers.io())
-            .subscribe({ movieList ->
-                val movie = movieList.results?.firstOrNull()
-                if (movie != null) {
-                    movieDetailsState.value = MovieDetailsState.Success(movie)
-                    movie.titleText?.text?.let { checkIsMovieFavourite(it) }
-                } else {
-                    movieDetailsState.value = MovieDetailsState.Error("No movie found")
-                }
-            }, { error ->
-                movieDetailsState.value =
-                    MovieDetailsState.Error(error.message ?: "Unknown error occurred")
-            })
+            .subscribe(
+                { movieList ->
+                    val movie = movieList.results?.firstOrNull()
+                    if (movie != null) {
+                        movieDetailsState.value = MovieDetailsState.Success(movie)
+                        movie.titleText?.text?.let { checkIsMovieFavourite(it) }
+                    } else {
+                        movieDetailsState.value = MovieDetailsState.Error("No movie found")
+                    }
+                },
+                { error ->
+                    movieDetailsState.value =
+                        MovieDetailsState.Error(error.message ?: "Unknown error occurred")
+                })
     }
 
     fun addMovieToFavourites(title: String) {
@@ -60,12 +62,11 @@ class MovieDetailsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val isMovieFavourite = favouriteMovieRepository.isMovieFavourite(title)
             isFavourite.value = isMovieFavourite
-            println(isFavourite.value)
         }
 
     override fun onCleared() {
         super.onCleared()
-        randomMovieDisposable?.dispose() // Dispose of the subscription when ViewModel is cleared
+        randomMovieDisposable?.dispose()
     }
 
     companion object {

@@ -27,10 +27,5 @@ val Typography = Typography(
         fontFamily = FontFamily(Font(R.font.dm_sans_regular)),
         fontSize = 16.sp,
         lineHeight = 24.sp
-    ),
-    labelLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.dm_sans_bold)),
-        fontSize = 14.sp,
-        lineHeight = 20.sp
     )
 )
